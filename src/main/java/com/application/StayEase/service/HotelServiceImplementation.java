@@ -2,7 +2,7 @@ package com.application.StayEase.service;
 
 import com.application.StayEase.dto.HotelDto;
 import com.application.StayEase.entity.Hotel;
-import com.application.StayEase.exception.ResouceNotFoundException;
+import com.application.StayEase.exception.ResourceNotFoundException;
 import com.application.StayEase.repository.HotelRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,39 @@ public class HotelServiceImplementation implements HotelService {
         log.info("getting the hotel with id: {}", id);
         Hotel hotel = hotelRepository
                 .findById(id)
-                .orElseThrow(() -> new ResouceNotFoundException("hotel not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("hotel not found with id: " + id));
              return modelMapper.map(hotel, HotelDto.class);
     }
+
+    @Override
+    public HotelDto updateHotelById(Long id, HotelDto hotelDto) {
+        log.info("Updating the hotel with id: {}", id);
+        Hotel hotel = hotelRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("hotel not found with id: " + id));
+        modelMapper.map(hotelDto, hotel);
+        hotel.setId(id);
+        hotel = hotelRepository.save(hotel);
+        return modelMapper.map(hotel, HotelDto.class);
+    }
+
+    @Override
+    public void deleteHotelById(Long id) {
+        boolean exists = hotelRepository.existsById(id);
+        if(!exists) throw new ResourceNotFoundException("Hotel not found with id:" + id);
+        hotelRepository.deleteById(id);
+        //TODO delete the future inventories for this hotel
+    }
+
+    @Override
+    public void activateHotel(Long hotelId) {
+        log.info("Activating the hotel with id: {}", hotelId);
+        Hotel hotel = hotelRepository
+                .findById(hotelId)
+                .orElseThrow(() -> new ResourceNotFoundException("hotel not found with id: " + hotelId));
+        hotel.setActive(true);
+        //TODO create inventory for the rooms of this hotel
+    }
+
+
 }
