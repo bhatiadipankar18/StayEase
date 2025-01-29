@@ -2,6 +2,7 @@ package com.application.StayEase.service;
 
 import com.application.StayEase.dto.HotelDto;
 import com.application.StayEase.entity.Hotel;
+import com.application.StayEase.entity.Room;
 import com.application.StayEase.exception.ResourceNotFoundException;
 import com.application.StayEase.repository.HotelRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ public class HotelServiceImplementation implements HotelService {
 
     private final HotelRepository hotelRepository;
     private final ModelMapper modelMapper;
+    private final InventoryService inventoryService;
 
     @Override
     public HotelDto createNewHotel(HotelDto hotelDto) {
@@ -54,6 +56,7 @@ public class HotelServiceImplementation implements HotelService {
         if(!exists) throw new ResourceNotFoundException("Hotel not found with id:" + id);
         hotelRepository.deleteById(id);
         //TODO delete the future inventories for this hotel
+
     }
 
     @Override
@@ -63,7 +66,15 @@ public class HotelServiceImplementation implements HotelService {
                 .findById(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("hotel not found with id: " + hotelId));
         hotel.setActive(true);
+
         //TODO create inventory for the rooms of this hotel
+
+        //Assuming doing it once
+
+        for(Room room: hotel.getRooms()){
+            inventoryService.initializeRoomForAYear(room);
+        }
+
     }
 
 
