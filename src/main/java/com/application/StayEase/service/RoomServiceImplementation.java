@@ -22,6 +22,7 @@ public class RoomServiceImplementation implements RoomService{
 
     private final RoomRepository roomRepository;
     private final HotelRepository hotelRepository;
+    private final InventoryService inventoryService;
     private final ModelMapper modelMapper;
 
     @Override
@@ -34,8 +35,9 @@ public class RoomServiceImplementation implements RoomService{
         room.setHotel(hotel);
         room = roomRepository.save(room);
 
-        //TODO create inventory as soon as room is created
-
+        if(hotel.getActive()){
+            inventoryService.initializeRoomForAYear(room);
+        }
         return modelMapper.map(room, RoomDto.class);
     }
 
