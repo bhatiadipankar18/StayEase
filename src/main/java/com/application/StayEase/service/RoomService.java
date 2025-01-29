@@ -12,7 +12,7 @@ public interface RoomService {
 
     List<RoomDto> getAllRoomsInHotel(Long hotelId);
 
-    RoomDto updateRoomById(Long roomId);
+ //   RoomDto updateRoomById(Long roomId);
 
     void deleteRoomById(Long roomId);
 

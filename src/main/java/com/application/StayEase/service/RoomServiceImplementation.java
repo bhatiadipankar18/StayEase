@@ -8,6 +8,7 @@ import com.application.StayEase.repository.HotelRepository;
 import com.application.StayEase.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.modelmapper.ModelMapper;
 
@@ -40,7 +41,11 @@ public class RoomServiceImplementation implements RoomService{
 
     @Override
     public RoomDto getRoomById(Long roomId) {
-        return null;
+        log.info("getting room with Id: {}" + roomId);
+        Room room = roomRepository
+                .findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("room not found with id: " + roomId));
+        return modelMapper.map(room, RoomDto.class);
     }
 
     @Override
@@ -56,13 +61,20 @@ public class RoomServiceImplementation implements RoomService{
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public RoomDto updateRoomById(Long roomId) {
-        return null;
-    }
+//    @Override
+//    public RoomDto updateRoomById(Long roomId) {
+//        return null;
+//    }
 
     @Override
     public void deleteRoomById(Long roomId) {
+        log.info("deleting room with id: {}" + roomId);
+        boolean exists = roomRepository.existsById(roomId);
+        if(!exists){
+            throw new ResourceNotFoundException("Room not found with id: {}" + roomId);
+        }
+        roomRepository.deleteById(roomId);
 
+        //TODO delete all future inventories for this room
     }
 }
