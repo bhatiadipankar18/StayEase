@@ -6,6 +6,7 @@ import com.application.StayEase.entity.Room;
 import com.application.StayEase.exception.ResourceNotFoundException;
 import com.application.StayEase.repository.HotelRepository;
 import com.application.StayEase.repository.RoomRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +52,7 @@ public class RoomServiceImplementation implements RoomService{
     }
 
     @Override
+    @Transactional
     public List<RoomDto> getAllRoomsInHotel(Long hotelId) {
         log.info("getting all the rooms in a hotel with Id: {}" + hotelId);
         Hotel hotel = hotelRepository
@@ -71,12 +73,12 @@ public class RoomServiceImplementation implements RoomService{
     @Override
     public void deleteRoomById(Long roomId) {
         log.info("deleting room with id: {}" + roomId);
-        boolean exists = roomRepository.existsById(roomId);
-        if(!exists){
-            throw new ResourceNotFoundException("Room not found with id: {}" + roomId);
-        }
+        Room room = roomRepository
+                .findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("room not found with id: " + roomId));
         roomRepository.deleteById(roomId);
+        inventoryService.deleteFutureInventories(room);
 
-        //TODO delete all future inventories for this room
+
     }
 }
