@@ -13,4 +13,8 @@ public interface HotelService {
     void deleteHotelById(Long id);
 
     void activateHotel(Long hotelId);
+
+    default void seekRoom(Long hotelId){
+        System.out.print("seeking a hotel");
+    }
 }

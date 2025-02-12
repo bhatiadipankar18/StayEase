@@ -71,14 +71,13 @@ public class RoomServiceImplementation implements RoomService{
 //    }
 
     @Override
+    @Transactional
     public void deleteRoomById(Long roomId) {
         log.info("deleting room with id: {}" + roomId);
         Room room = roomRepository
                 .findById(roomId)
                 .orElseThrow(() -> new ResourceNotFoundException("room not found with id: " + roomId));
-        roomRepository.deleteById(roomId);
         inventoryService.deleteFutureInventories(room);
-
-
+        roomRepository.deleteById(roomId);
     }
 }
